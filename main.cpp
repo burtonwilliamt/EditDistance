@@ -15,6 +15,7 @@ struct board{
 };
 
 
+
 //allows printing of the fill carachter from (x,y) to (x,y+hight-1)
 void print_col(int x, int y, char fill, int hight){
     for(int i = 0; i < hight; ++i){
@@ -30,6 +31,48 @@ void print_row(int x, int y, char fill, int hight){
 }
 
 
+void pushAlign(const string& full, string& align, int pos){
+  if(pos == -1){
+    align = "_" + align;
+  }else{
+    align = full.at(pos) + align;
+  }
+}
+
+
+void alignment(const board& b, string& iAlign, string& cAlign){
+  iAlign = "";
+  cAlign = "";
+  int x = b.curs_x;
+  int y = b.curs_y;
+  while(x != 0 || y != 0){
+
+    //the the two things are the same, then don't add 1 when going diagonally
+    int same = 0;
+    if(x > 0 && y > 0 && b.input.at(x-1) != b.compare.at(y-1)){
+      same = 1;
+    }
+    //can go diagonally
+    if(x > 0 && y > 0 && b.vec[x-1][y-1]+same == b.vec[x][y]){
+      pushAlign(b.input, iAlign, x-1);
+      pushAlign(b.compare, cAlign, y-1);
+      --x;
+      --y;
+    }
+    //can add a space to iAlign
+    else if(y > 0 && b.vec[x][y-1]+1 == b.vec[x][y]){
+      pushAlign(b.input, iAlign, -1);
+      pushAlign(b.compare, cAlign, y-1);
+      --y;
+    }
+    //can add a space to cAlign
+    else if(x > 0 && b.vec[x-1][y]+1 == b.vec[x][y]){
+      pushAlign(b.input, iAlign, x-1);
+      pushAlign(b.compare, cAlign, -1);
+      --x;
+    }
+  }
+}
 
 
 //draw the whole board
@@ -73,8 +116,22 @@ void drawBoard(const board& b, int pos_x, int pos_y){
 }
 
 void draw(const board& b){
-  mvprintw(0,0, "Mode: ");
-  drawBoard(b, 0,2);
+  drawBoard(b, 0,0);
+  //the board uses b.vec[0].size()*2+2 lines
+  int board_end = b.vec[0].size()*2+2;
+  string iAlign = "";
+  string cAlign = "";
+  alignment(b,iAlign, cAlign);
+  //clear the readout lines
+  string temp(2*max(b.vec.size(), b.vec[0].size()), ' ');
+  mvprintw(board_end+2, 0, temp.c_str());
+  mvprintw(board_end+3, 0, temp.c_str());
+
+  //populate the readouts
+  mvprintw(board_end+1, 0, "Number of edits shown by value at position on board");
+  mvprintw(board_end+2, 0, iAlign.c_str());
+  mvprintw(board_end+3, 0, cAlign.c_str());
+
 }
 
 void solve(board& b){
