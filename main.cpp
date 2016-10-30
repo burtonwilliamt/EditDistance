@@ -12,6 +12,7 @@ struct board{
   string compare;
   int curs_x;
   int curs_y;
+  int sols;
 };
 
 
@@ -39,13 +40,16 @@ void pushAlign(const string& full, string& align, int pos){
   }
 }
 
+void popAlign(string& align){
+  align = string(align, 1, align.size()-1);
+}
 
-void alignment(const board& b, string& iAlign, string& cAlign){
-  iAlign = "";
-  cAlign = "";
-  int x = b.curs_x;
-  int y = b.curs_y;
-  while(x != 0 || y != 0){
+
+void alignmentHelper(const board& b, string& iAlign, string& cAlign, vector<string>& iSols, vector<string>& cSols, int x, int y){
+  if(x == 0 && y == 0){
+    iSols.push_back(iAlign);
+    cSols.push_back(cAlign);
+  }else{
 
     //the the two things are the same, then don't add 1 when going diagonally
     int same = 0;
@@ -56,22 +60,33 @@ void alignment(const board& b, string& iAlign, string& cAlign){
     if(x > 0 && y > 0 && b.vec[x-1][y-1]+same == b.vec[x][y]){
       pushAlign(b.input, iAlign, x-1);
       pushAlign(b.compare, cAlign, y-1);
-      --x;
-      --y;
+      alignmentHelper(b, iAlign, cAlign, iSols, cSols, x-1, y-1);
+      popAlign(iAlign);
+      popAlign(cAlign);
     }
     //can add a space to iAlign
-    else if(y > 0 && b.vec[x][y-1]+1 == b.vec[x][y]){
+    if(y > 0 && b.vec[x][y-1]+1 == b.vec[x][y]){
       pushAlign(b.input, iAlign, -1);
       pushAlign(b.compare, cAlign, y-1);
-      --y;
+      alignmentHelper(b, iAlign, cAlign, iSols, cSols, x, y-1);
+      popAlign(iAlign);
+      popAlign(cAlign);
     }
     //can add a space to cAlign
-    else if(x > 0 && b.vec[x-1][y]+1 == b.vec[x][y]){
+    if(x > 0 && b.vec[x-1][y]+1 == b.vec[x][y]){
       pushAlign(b.input, iAlign, x-1);
       pushAlign(b.compare, cAlign, -1);
-      --x;
+      alignmentHelper(b, iAlign, cAlign, iSols, cSols, x-1, y);
+      popAlign(iAlign);
+      popAlign(cAlign);
     }
   }
+}
+
+void alignment(const board& b, vector<string>& iSols, vector<string>& cSols){
+  string iAlign = "";
+  string cAlign = "";
+  alignmentHelper(b, iAlign, cAlign, iSols, cSols, b.curs_x, b.curs_y);
 }
 
 
@@ -115,22 +130,30 @@ void drawBoard(const board& b, int pos_x, int pos_y){
 
 }
 
-void draw(const board& b){
+void draw(board& b){
   drawBoard(b, 0,0);
   //the board uses b.vec[0].size()*2+2 lines
   int board_end = b.vec[0].size()*2+2;
-  string iAlign = "";
-  string cAlign = "";
-  alignment(b,iAlign, cAlign);
+  vector<string> iSols;
+  vector<string> cSols;
+  alignment(b, iSols, cSols);
   //clear the readout lines
-  string temp(2*max(b.vec.size(), b.vec[0].size()), ' ');
-  mvprintw(board_end+2, 0, temp.c_str());
-  mvprintw(board_end+3, 0, temp.c_str());
+  for(int i = 1; i < b.sols+1; ++i){
+    string temp(2*max(b.vec.size(), b.vec[0].size()), ' ');
+    mvprintw(board_end+(i*3)+2, 0, temp.c_str());
+    mvprintw(board_end+(i*3)+3, 0, temp.c_str());
+  }
+
+  b.sols = iSols.size();
 
   //populate the readouts
   mvprintw(board_end+1, 0, "Number of edits shown by value at position on board");
-  mvprintw(board_end+2, 0, iAlign.c_str());
-  mvprintw(board_end+3, 0, cAlign.c_str());
+  mvprintw(board_end+3, 0, "Alignmnets:");
+
+  for(int i = 1; i < b.sols+1; ++i){
+    mvprintw(board_end+(i*3)+2, 0, iSols[i-1].c_str());
+    mvprintw(board_end+(i*3)+3, 0, cSols[i-1].c_str());
+  }
 
 }
 
@@ -189,6 +212,8 @@ int main(int argc, char* argv[]){
   b.compare = "snowy";
 
   b.vec = vector<vector<int> > (b.input.size()+1, vector<int> (b.compare.size()+1, -1));
+
+  b.sols = 0;
 
   //clear the board, and draw it.
   reset(b);
