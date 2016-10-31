@@ -243,9 +243,9 @@ int main(int argc, char* argv[]){
 
     //Different arrow keys
     if(c == 259 && b.curs_y > 0){--b.curs_y;}
-    else if(c == 258 && b.curs_y < b.vec[0].size()-1){++b.curs_y;}
+    else if(c == 258 && b.curs_y < (int) b.vec[0].size()-1){++b.curs_y;}
     else if(c == 260 && b.curs_x > 0){--b.curs_x;}
-    else if(c == 261 && b.curs_x < b.vec.size()-1){++b.curs_x;}
+    else if(c == 261 && b.curs_x < (int) b.vec.size()-1){++b.curs_x;}
     //draw what's changed
     draw(b);
   }
