@@ -19,14 +19,14 @@ struct board{
 
 //allows printing of the fill carachter from (x,y) to (x,y+hight-1)
 void print_col(int x, int y, char fill, int hight){
-    for(unsigned int i = 0; i < hight; ++i){
+    for(int i = 0; i < hight; ++i){
         mvaddch(y+i, x, fill);//moving to y+i line, x column and add fill
     }
 }
 
 //allows printing of the fill carachter from (x,y) to (x+hight-1,y)
 void print_row(int x, int y, char fill, int hight){
-    for(unsigned int i = 0; i < hight; ++i){
+    for(int i = 0; i < hight; ++i){
         mvaddch(y, x+i, fill);//moving to y+i line, x column and add fill
     }
 }
@@ -149,14 +149,14 @@ void draw(board& b){
   int docs_end = 5;
 
   //clear the readout lines
-  for(unsigned int i = 0; i < b.sols; ++i){
+  for(int i = 0; i < b.sols; ++i){
     string temp(2*max(b.vec.size(), b.vec[0].size()), ' ');
     mvprintw(docs_end+(i*3), board_end+spacing, temp.c_str());
     mvprintw(docs_end+(i*3)+1, board_end+spacing, temp.c_str());
   }
 
   b.sols = iSols.size();
-  for(unsigned int i = 0; i < b.sols; ++i){
+  for(int i = 0; i < b.sols; ++i){
     mvprintw(docs_end+(i*3), board_end+spacing, iSols[i].c_str());
     mvprintw(docs_end+(i*3)+1, board_end+spacing, cSols[i].c_str());
   }
