@@ -114,7 +114,7 @@ void drawBoard(const board& b, int pos_x, int pos_y){
         for(int y = 0; y < b.vec[0].size(); ++y){
           //if(b.vec[x][y] >= 0){
             char buffer[3];
-            snprintf (buffer, 3, "%02d", b.vec[x][y]);
+            snprintf (buffer, 3, "%2d", b.vec[x][y]);
             // string temp = to_string(b.vec[x][y]);
             string temp = buffer;
             mvprintw(pos_y+2+(2*y), pos_x+3+(3*x), buffer);
@@ -133,26 +133,32 @@ void drawBoard(const board& b, int pos_x, int pos_y){
 void draw(board& b){
   drawBoard(b, 0,0);
   //the board uses b.vec[0].size()*2+2 lines
-  int board_end = b.vec[0].size()*2+2;
+  int board_end = b.vec.size()*3+4;
+  int spacing = 4;
   vector<string> iSols;
   vector<string> cSols;
   alignment(b, iSols, cSols);
+
+
+  //populate the readouts
+  mvprintw(1, board_end+spacing, "Number of edits shown by value at position on board");
+  mvprintw(2, board_end+spacing, "Move with arrow keys, leave with esc.");
+  mvprintw(3, board_end+spacing, "Alignmnets:");
+
+
+  int docs_end = 5;
+
   //clear the readout lines
-  for(int i = 1; i < b.sols+1; ++i){
+  for(int i = 0; i < b.sols; ++i){
     string temp(2*max(b.vec.size(), b.vec[0].size()), ' ');
-    mvprintw(board_end+(i*3)+2, 0, temp.c_str());
-    mvprintw(board_end+(i*3)+3, 0, temp.c_str());
+    mvprintw(docs_end+(i*3), board_end+spacing, temp.c_str());
+    mvprintw(docs_end+(i*3)+1, board_end+spacing, temp.c_str());
   }
 
   b.sols = iSols.size();
-
-  //populate the readouts
-  mvprintw(board_end+1, 0, "Number of edits shown by value at position on board");
-  mvprintw(board_end+3, 0, "Alignmnets:");
-
-  for(int i = 1; i < b.sols+1; ++i){
-    mvprintw(board_end+(i*3)+2, 0, iSols[i-1].c_str());
-    mvprintw(board_end+(i*3)+3, 0, cSols[i-1].c_str());
+  for(int i = 0; i < b.sols; ++i){
+    mvprintw(docs_end+(i*3), board_end+spacing, iSols[i].c_str());
+    mvprintw(docs_end+(i*3)+1, board_end+spacing, cSols[i].c_str());
   }
 
 }
@@ -208,8 +214,8 @@ int main(int argc, char* argv[]){
   b.curs_x = 0;
   b.curs_y = 0;
 
-  b.input = "sunny";
-  b.compare = "snowy";
+  b.input = "snowy";
+  b.compare = "sunny";
 
   b.vec = vector<vector<int> > (b.input.size()+1, vector<int> (b.compare.size()+1, -1));
 
@@ -240,10 +246,6 @@ int main(int argc, char* argv[]){
     else if(c == 258 && b.curs_y < b.vec[0].size()-1){++b.curs_y;}
     else if(c == 260 && b.curs_x > 0){--b.curs_x;}
     else if(c == 261 && b.curs_x < b.vec.size()-1){++b.curs_x;}
-    //if spacebar, reset the board
-    else if(c == 32){
-      reset(b);
-    }
     //draw what's changed
     draw(b);
   }
