@@ -1,6 +1,6 @@
 #include <iostream>
-#include <Vector>
-#include <String>
+#include <vector>
+#include <string>
 #include <ncurses.h>
 
 using namespace std;
@@ -19,14 +19,14 @@ struct board{
 
 //allows printing of the fill carachter from (x,y) to (x,y+hight-1)
 void print_col(int x, int y, char fill, int hight){
-    for(int i = 0; i < hight; ++i){
+    for(unsigned int i = 0; i < hight; ++i){
         mvaddch(y+i, x, fill);//moving to y+i line, x column and add fill
     }
 }
 
 //allows printing of the fill carachter from (x,y) to (x+hight-1,y)
 void print_row(int x, int y, char fill, int hight){
-    for(int i = 0; i < hight; ++i){
+    for(unsigned int i = 0; i < hight; ++i){
         mvaddch(y, x+i, fill);//moving to y+i line, x column and add fill
     }
 }
@@ -93,25 +93,25 @@ void alignment(const board& b, vector<string>& iSols, vector<string>& cSols){
 //draw the whole board
 void drawBoard(const board& b, int pos_x, int pos_y){
     //print the input string across the top
-    for(int i = 0; i < b.input.size(); ++i){
+    for(unsigned int i = 0; i < b.input.size(); ++i){
       mvaddch(pos_y ,pos_x+6+(3*i), b.input.at(i));
     }
     //print the compare string along the left
-    for(int i = 0; i < b.compare.size(); ++i){
+    for(unsigned int i = 0; i < b.compare.size(); ++i){
       mvaddch(pos_y+4+(2*i), pos_x, b.compare.at(i));
     }
     //create the horizontal row lines
-    for(int i = 0; i < b.compare.size()+2; ++i){
+    for(unsigned int i = 0; i < b.compare.size()+2; ++i){
       print_row(pos_x+2, pos_y+1+(2*i), '-', b.vec.size()*3);
     }
 
     //create the vertical column lines
-    for(int i = 0; i < b.input.size()+2; ++i){
+    for(unsigned int i = 0; i < b.input.size()+2; ++i){
       print_col(pos_x+2+(3*i), pos_y+1, '|', b.vec[0].size()*2+1);
     }
     //print the cell values
-    for(int x = 0; x < b.vec.size(); ++x){
-        for(int y = 0; y < b.vec[0].size(); ++y){
+    for(unsigned int x = 0; x < b.vec.size(); ++x){
+        for(unsigned int y = 0; y < b.vec[0].size(); ++y){
           //if(b.vec[x][y] >= 0){
             char buffer[3];
             snprintf (buffer, 3, "%2d", b.vec[x][y]);
@@ -149,14 +149,14 @@ void draw(board& b){
   int docs_end = 5;
 
   //clear the readout lines
-  for(int i = 0; i < b.sols; ++i){
+  for(unsigned int i = 0; i < b.sols; ++i){
     string temp(2*max(b.vec.size(), b.vec[0].size()), ' ');
     mvprintw(docs_end+(i*3), board_end+spacing, temp.c_str());
     mvprintw(docs_end+(i*3)+1, board_end+spacing, temp.c_str());
   }
 
   b.sols = iSols.size();
-  for(int i = 0; i < b.sols; ++i){
+  for(unsigned int i = 0; i < b.sols; ++i){
     mvprintw(docs_end+(i*3), board_end+spacing, iSols[i].c_str());
     mvprintw(docs_end+(i*3)+1, board_end+spacing, cSols[i].c_str());
   }
@@ -164,8 +164,8 @@ void draw(board& b){
 }
 
 void solve(board& b){
-  for(int x = 0; x < b.vec.size(); ++x){
-    for(int y = 0; y < b.vec[0].size(); ++y){
+  for(unsigned int x = 0; x < b.vec.size(); ++x){
+    for(unsigned int y = 0; y < b.vec[0].size(); ++y){
       if(x == 0){
         b.vec[x][y] = y;
       }else if(y == 0){
@@ -187,8 +187,8 @@ void reset(board& b){
   //clear the ncurses window
   clear();
   //empty all positions
-  for(int x = 0; x < b.vec.size(); ++x){
-      for(int y = 0; y < b.vec[0].size(); ++y){
+  for(unsigned int x = 0; x < b.vec.size(); ++x){
+      for(unsigned int y = 0; y < b.vec[0].size(); ++y){
           b.vec[x][y] = -1;
       }
   }
